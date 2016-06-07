@@ -20,6 +20,16 @@ func TestHOTP(t *testing.T) {
 		digits  int
 		optWant string
 	}{
+		{0, nil, 6, "755224"},
+		{1, nil, 6, "287082"},
+		{2, nil, 6, "359152"},
+		{3, nil, 6, "969429"},
+		{4, nil, 6, "338314"},
+		{5, nil, 6, "254676"},
+		{6, nil, 6, "287922"},
+		{7, nil, 6, "162583"},
+		{8, nil, 6, "399871"},
+		{9, nil, 6, "520489"},
 		{0, sha1Func, 6, "755224"},
 		{1, sha1Func, 6, "287082"},
 		{2, sha1Func, 6, "359152"},
@@ -99,4 +109,10 @@ func TestTOTPNow(t *testing.T) {
 		t.Errorf("GetTOTPNow(%q, %v 6) = %v, want lenght of 6", secret32encoded, sha1.New, otpGot)
 	}
 
+}
+
+func TestGenerateOTPSecret(t *testing.T) {
+	if secret, _ := GenerateOTPSecret(20); len(secret) != 32 {
+		t.Errorf("GenerateOTPSecret(20) = %v, length %v, want length 32", secret, len(secret))
+	}
 }
