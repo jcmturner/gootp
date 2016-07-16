@@ -65,13 +65,13 @@ func extractFromHash(hash []byte) uint32 {
 }
 
 /*
-Get the HMAC-based One Time Password (RFC 4226). Providing the following inputs:
-- Secret string at least 16 bytes / 128 bits in length
-- Counter value, the moving factor (see RFC 4226 section 5.2).  This counter MUST be synchronized between the HOTP generator (client) and the HOTP validator (server).
-- A hash function to use, eg SHA1, SHA256, SHA512
-- The number of digits to be returned in the OTP. Must be a minimum of 6.
+ Get the HMAC-based One Time Password (RFC 4226). Providing the following inputs:
+ 	- Secret string at least 16 bytes / 128 bits in length
+ 	- Counter value, the moving factor (see RFC 4226 section 5.2).  This counter MUST be synchronized between the HOTP generator (client) and the HOTP validator (server).
+ 	- A hash function to use, eg SHA1, SHA256, SHA512
+ 	- The number of digits to be returned in the OTP. Must be a minimum of 6.
 
-Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate
+ Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate
 */
 func GetHOTP(secret string, count int64, mode func() hash.Hash, digits int) (otp string, err error) {
 	if digits < 6 {
@@ -103,13 +103,13 @@ func GetHOTP(secret string, count int64, mode func() hash.Hash, digits int) (otp
 }
 
 /*
-Get the Time-based One Time Password (RFC 6238) for the current time. Providing the following inputs:
-- Secret string at least 16 bytes / 128 bits in length.
-- A hash function to use, eg SHA1, SHA256, SHA512.
-- The number of digits to be returned in the OTP. Must be a minimum of 6.
+ Get the Time-based One Time Password (RFC 6238) for the current time. Providing the following inputs:
+ 	- Secret string at least 16 bytes / 128 bits in length.
+ 	- A hash function to use, eg SHA1, SHA256, SHA512.
+ 	- The number of digits to be returned in the OTP. Must be a minimum of 6.
 
-Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate.
-The number of seconds the OTP is valid for is also returned.
+ Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate.
+ The number of seconds the OTP is valid for is also returned.
 */
 func GetTOTPNow(secret string, mode func() hash.Hash, digits int) (otp string, timeRemaining int, err error) {
 	otp, timeRemaining, err = GetTOTPAt(secret, time.Now().UTC(), mode, digits)
@@ -117,14 +117,14 @@ func GetTOTPNow(secret string, mode func() hash.Hash, digits int) (otp string, t
 }
 
 /*
-Get the Time-based One Time Password (RFC 6238) for a specific time. Providing the following inputs:
-- Secret string at least 16 bytes / 128 bits in length.
-- The UTC time for which the TOTP should be generated.
-- A hash function to use, eg SHA1, SHA256, SHA512.
-- The number of digits to be returned in the OTP. Must be a minimum of 6.
+ Get the Time-based One Time Password (RFC 6238) for a specific time. Providing the following inputs:
+ 	- Secret string at least 16 bytes / 128 bits in length.
+ 	- The UTC time for which the TOTP should be generated.
+ 	- A hash function to use, eg SHA1, SHA256, SHA512.
+ 	- The number of digits to be returned in the OTP. Must be a minimum of 6.
 
-Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate.
-The number of seconds the OTP is valid for is also returned.
+ Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate.
+ The number of seconds the OTP is valid for is also returned.
 */
 func GetTOTPAt(secret string, t time.Time, h func() hash.Hash, digits int) (otp string, timeRemaining int, err error) {
 	key, err := generateHashKey(secret)
@@ -146,13 +146,13 @@ func GetTOTPAt(secret string, t time.Time, h func() hash.Hash, digits int) (otp 
 }
 
 /*
-Get a Time-based One Time Password history (RFC 6238). Providing the following inputs:
-- Secret string at least 16 bytes / 128 bits in length.
-- A hash function to use, eg SHA1, SHA256, SHA512.
-- The number of digits to be returned in the OTP. Must be a minimum of 6.
+ Get a Time-based One Time Password history (RFC 6238). Providing the following inputs:
+ 	- Secret string at least 16 bytes / 128 bits in length.
+ 	- A hash function to use, eg SHA1, SHA256, SHA512.
+ 	- The number of digits to be returned in the OTP. Must be a minimum of 6.
 
-Note that the returned OTP is an array of strings as a leading zero is valid so an integer type is not appropriate. The first element in the array is the current OTP.
-The number of seconds the current OTP is valid for is also returned.
+ Note that the returned OTP is an array of strings as a leading zero is valid so an integer type is not appropriate. The first element in the array is the current OTP.
+ The number of seconds the current OTP is valid for is also returned.
 */
 func GetTOTPHistory(secret string, h func() hash.Hash, digits int, history int) (otps []string, timeRemaining int, err error) {
 	key, err := generateHashKey(secret)
