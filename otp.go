@@ -72,7 +72,7 @@ func extractFromHash(hash []byte) uint32 {
 //    - The number of digits to be returned in the OTP. Must be a minimum of 6.
 //
 // Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate
-func GetHOTP(secret string, count int64, mode func() hash.Hash, digits int) (otp string, err error) {
+func GetHOTP(secret string, count int64, h func() hash.Hash, digits int) (otp string, err error) {
 	if digits < 6 {
 		err = errors.New("The number of digits of the OTP generated must be at least 6")
 		return
@@ -89,10 +89,10 @@ func GetHOTP(secret string, count int64, mode func() hash.Hash, digits int) (otp
 	if err != nil {
 		return
 	}
-	if mode == nil {
-		mode = sha1.New
+	if h == nil {
+		h = sha1.New
 	}
-	hash, err := hmacMsg(msg, key, mode)
+	hash, err := hmacMsg(msg, key, h)
 	if err != nil {
 		return
 	}
@@ -109,8 +109,8 @@ func GetHOTP(secret string, count int64, mode func() hash.Hash, digits int) (otp
 // Note that the returned OTP is a string as a leading zero is valid so an integer type is not appropriate.
 //
 // The number of seconds the OTP is valid for is also returned.
-func GetTOTPNow(secret string, mode func() hash.Hash, digits int) (otp string, timeRemaining int, err error) {
-	otp, timeRemaining, err = GetTOTPAt(secret, time.Now().UTC(), mode, digits)
+func GetTOTPNow(secret string, h func() hash.Hash, digits int) (otp string, timeRemaining int, err error) {
+	otp, timeRemaining, err = GetTOTPAt(secret, time.Now().UTC(), h, digits)
 	return
 }
 
