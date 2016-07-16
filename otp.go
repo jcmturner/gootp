@@ -177,7 +177,8 @@ func GetTOTPHistory(secret string, h func() hash.Hash, digits int, history int) 
 	return
 }
 
-// Generate a base32 encoded secret string to be shared between the client and the server for OTPs
+// Generate a base32 encoded secret string to be shared between the client and the server for OTPs.
+//
 // Specify the length of the secret to generate in bytes. Note this needs to be at least 16 bytes / 128 bits.
 func GenerateOTPSecret(s int) (string, error) {
 	if s < 16 {
