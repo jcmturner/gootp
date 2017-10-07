@@ -11,10 +11,10 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"math"
 	"strconv"
 	"strings"
 	"time"
+	"math"
 )
 
 func hmacMsg(c, key []byte, h func() hash.Hash) ([]byte, error) {
@@ -65,7 +65,7 @@ func extractFromHash(hash []byte) uint32 {
 	return binary.BigEndian.Uint32(b[:])
 }
 
-// Get the HMAC-based One Time Password (RFC 4226). Providing the following inputs:
+// GetHOTP returns the HMAC-based One Time Password (RFC 4226). Providing the following inputs:
 //    - Secret string at least 16 bytes / 128 bits in length
 //    - Counter value, the moving factor (see RFC 4226 section 5.2).  This counter MUST be synchronized between the HOTP generator (client) and the HOTP validator (server).
 //    - A hash function to use, eg SHA1, SHA256, SHA512
@@ -92,16 +92,16 @@ func GetHOTP(secret string, count int64, h func() hash.Hash, digits int) (otp st
 	if h == nil {
 		h = sha1.New
 	}
-	hash, err := hmacMsg(msg, key, h)
+	hm, err := hmacMsg(msg, key, h)
 	if err != nil {
 		return
 	}
-	otpInt := int(math.Mod(float64(extractFromHash(hash)), math.Pow(10, float64(digits))))
+	otpInt := int(math.Mod(float64(extractFromHash(hm)), math.Pow(10, float64(digits))))
 	otp = fmt.Sprintf("%0"+strconv.Itoa(digits)+"d", otpInt)
 	return
 }
 
-// Get the Time-based One Time Password (RFC 6238) for the current time. Providing the following inputs:
+// GetTOTPNow returns the Time-based One Time Password (RFC 6238) for the current time. Providing the following inputs:
 //    - Secret string at least 16 bytes / 128 bits in length.
 //    - A hash function to use, eg SHA1, SHA256, SHA512.
 //    - The number of digits to be returned in the OTP. Must be a minimum of 6.
@@ -114,7 +114,7 @@ func GetTOTPNow(secret string, h func() hash.Hash, digits int) (otp string, time
 	return
 }
 
-// Get the Time-based One Time Password (RFC 6238) for a specific time. Providing the following inputs:
+// GetTOTPAt returns the Time-based One Time Password (RFC 6238) for a specific time. Providing the following inputs:
 //    - Secret string at least 16 bytes / 128 bits in length.
 //    - The UTC time for which the TOTP should be generated.
 //    - A hash function to use, eg SHA1, SHA256, SHA512.
@@ -132,17 +132,17 @@ func GetTOTPAt(secret string, t time.Time, h func() hash.Hash, digits int) (otp 
 	if err != nil {
 		return
 	}
-	hash, err := hmacMsg(msg, key, h)
+	hm, err := hmacMsg(msg, key, h)
 	if err != nil {
 		return
 	}
 	timeRemaining = int(30 - math.Mod(float64(t.Unix()), 30))
-	otpInt := int(math.Mod(float64(extractFromHash(hash)), math.Pow(10, float64(digits))))
+	otpInt := int(math.Mod(float64(extractFromHash(hm)), math.Pow(10, float64(digits))))
 	otp = fmt.Sprintf("%0"+strconv.Itoa(digits)+"d", otpInt)
 	return
 }
 
-// Get a Time-based One Time Password history (RFC 6238). Providing the following inputs:
+// GetTOTPAt returns a Time-based One Time Password history (RFC 6238). Providing the following inputs:
 //
 //    - Secret string at least 16 bytes / 128 bits in length.
 //    - A hash function to use, eg SHA1, SHA256, SHA512.
@@ -165,19 +165,19 @@ func GetTOTPHistory(secret string, h func() hash.Hash, digits int, history int) 
 			err = ierr
 			return
 		}
-		hash, ierr := hmacMsg(msg, key, h)
+		hm, ierr := hmacMsg(msg, key, h)
 		if ierr != nil {
 			err = ierr
 			return
 		}
-		otpInt := int(math.Mod(float64(extractFromHash(hash)), math.Pow(10, float64(digits))))
+		otpInt := int(math.Mod(float64(extractFromHash(hm)), math.Pow(10, float64(digits))))
 		otp := fmt.Sprintf("%0"+strconv.Itoa(digits)+"d", otpInt)
 		otps = append(otps, otp)
 	}
 	return
 }
 
-// Generate a base32 encoded secret string to be shared between the client and the server for OTPs.
+// GenerateOTPSecret returns a base32 encoded secret string to be shared between the client and the server for OTPs.
 //
 // Specify the length of the secret to generate in bytes. Note this needs to be at least 16 bytes / 128 bits.
 func GenerateOTPSecret(s int) (string, error) {
