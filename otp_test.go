@@ -42,8 +42,8 @@ func TestHOTP(t *testing.T) {
 		{9, sha1Func, 6, "520489"},
 	}
 	for _, test := range tests {
-		if otpGot, _ := GetHOTP(secret32encoded, test.count, test.mode, test.digits); otpGot != test.optWant {
-			t.Errorf("totp.GetHOTP(%q, %v, hash, %v) = %v, want one time password %v\n", secret32encoded, test.count, test.digits, otpGot, test.optWant)
+		if otpGot, _ := HOTP(secret32encoded, test.count, test.mode, test.digits); otpGot != test.optWant {
+			t.Errorf("totp.HOTP(%q, %v, hash, %v) = %v, want one time password %v\n", secret32encoded, test.count, test.digits, otpGot, test.optWant)
 		}
 	}
 }
@@ -94,10 +94,10 @@ func TestTOTP(t *testing.T) {
 		default:
 			secret = secret32encodedSHA1
 		}
-		if optGot, remainGot, _ := GetTOTPAt(secret, time.Unix(test.time, 0).UTC(), test.mode, test.digits); optGot != test.optWant {
-			t.Errorf("totp.GetTOTPAt(%q, time.Unix(%v, 0).UTC()) = %v, want one time password %v", secret, test.time, optGot, test.optWant)
+		if optGot, remainGot, _ := TOTPAt(secret, time.Unix(test.time, 0).UTC(), test.mode, test.digits); optGot != test.optWant {
+			t.Errorf("totp.TOTPAt(%q, time.Unix(%v, 0).UTC()) = %v, want one time password %v", secret, test.time, optGot, test.optWant)
 		} else if remainGot != test.remainWant {
-			t.Errorf("totp.GetTOTPAt(%q, time.Unix(%v, 0).UTC()) = %v, want time remaining %v", secret, test.time, remainGot, test.remainWant)
+			t.Errorf("totp.TOTPAt(%q, time.Unix(%v, 0).UTC()) = %v, want time remaining %v", secret, test.time, remainGot, test.remainWant)
 		}
 	}
 }
@@ -105,7 +105,7 @@ func TestTOTP(t *testing.T) {
 func TestTOTPNow(t *testing.T) {
 	secret := "12345678901234567890"
 	secret32encoded := base32.StdEncoding.EncodeToString([]byte(secret))
-	if otpGot, _, _ := GetTOTPNow(secret32encoded, sha1.New, 6); len(otpGot) != 6 {
+	if otpGot, _, _ := TOTPNow(secret32encoded, sha1.New, 6); len(otpGot) != 6 {
 		t.Errorf("GetTOTPNow(%q, sha1.New, 6) = %v, want length of 6", secret32encoded, otpGot)
 	}
 
@@ -114,10 +114,10 @@ func TestTOTPNow(t *testing.T) {
 func TestGetTOTPHistory(t *testing.T) {
 	secret := "12345678901234567890"
 	secret32encoded := base32.StdEncoding.EncodeToString([]byte(secret))
-	if otpsGot, _, _ := GetTOTPHistory(secret32encoded, sha1.New, 6, 3); len(otpsGot) != 3 {
+	if otpsGot, _, _ := TOTPHistory(secret32encoded, sha1.New, 6, 3); len(otpsGot) != 3 {
 		t.Errorf("GetTOTPHistory(%q, sha1.New, 6, 3) = %v, wanted array of 3 OTPs", secret32encoded, otpsGot)
 	} else {
-		latestOtp, _, _ := GetTOTPNow(secret32encoded, sha1.New, 6)
+		latestOtp, _, _ := TOTPNow(secret32encoded, sha1.New, 6)
 		if otpsGot[0] != latestOtp {
 			t.Error("First element in OTP history array is not the latest OTP")
 		}
