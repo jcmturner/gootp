@@ -1,4 +1,4 @@
-// One time password implementation of RFC 6238 (TOTP) and RFC 4226 (HOTP)
+// Package gootp is a one time password implementation of RFC 6238 (TOTP) and RFC 4226 (HOTP)
 package gootp
 
 import (
@@ -11,10 +11,10 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"math"
 	"strconv"
 	"strings"
 	"time"
-	"math"
 )
 
 func hmacMsg(c, key []byte, h func() hash.Hash) ([]byte, error) {
@@ -142,7 +142,7 @@ func GetTOTPAt(secret string, t time.Time, h func() hash.Hash, digits int) (otp 
 	return
 }
 
-// GetTOTPAt returns a Time-based One Time Password history (RFC 6238). Providing the following inputs:
+// GetTOTPHistory returns a Time-based One Time Password history (RFC 6238). Providing the following inputs:
 //
 //    - Secret string at least 16 bytes / 128 bits in length.
 //    - A hash function to use, eg SHA1, SHA256, SHA512.
